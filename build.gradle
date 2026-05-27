@@ -1,16 +1,34 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.6'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.3.0' // Đổi từ 4.0.6 về bản 3.3.0 ổn định
+    id 'io.spring.dependency-management' version '1.1.5' // Đồng bộ dependency management tương ứng
+    id 'jacoco'
 }
 
-group = 'com.ra'
+jacoco {
+    toolVersion = "0.8.12" // Phiên bản Jacoco tương thích tốt với Spring Boot 3.3 và Java 21
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir("reports/jacoco")
+    }
+}
+
+group = 'SpringBootRestAPI'
 version = '0.0.1-SNAPSHOT'
-description = 'PTIT_CNTT2_IT211_SS12_EX3'
+description = 'SpringAPI_Session11_UnitTest'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -19,23 +37,32 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-restclient'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    // --- TẦNG CHẠY ỨNG DỤNG (IMPLEMENTATION) ---
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // --- CƠ SỞ DỮ LIỆU ---
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // --- LOMBOK ---
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // --- CÔNG CỤ PHÁT TRIỂN ---
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // --- TẦNG KIỂM THỬ (TEST IMPLEMENTATION) ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Đoạn task này đã có cấu hình ở trên rồi nên có thể giữ nguyên hoặc xóa bớt 1 trong 2 cho gọn
 tasks.named('test') {
     useJUnitPlatform()
 }
